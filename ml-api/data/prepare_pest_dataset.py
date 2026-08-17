@@ -11,11 +11,11 @@ RAW_DIR = BASE_DIR / "data" / "raw"
 PLANTVILLAGE_DIR = RAW_DIR / "plantvillage"
 PROCESSED_DIR = BASE_DIR / "data" / "processed"
 
-# Define the target classes we want to keep
+# Define the target classes we want to keep (source_folder_name: target_folder_name)
 TARGET_CLASSES = {
-    "Tomato___healthy": "Tomato___healthy",
-    "Tomato___Early_blight": "Tomato___Early_blight",
-    "Tomato___Late_blight": "Tomato___Late_blight",
+    "Tomato_healthy": "Tomato___healthy",
+    "Tomato_Early_blight": "Tomato___Early_blight",
+    "Tomato_Late_blight": "Tomato___Late_blight",
     "Potato___healthy": "Potato___healthy",
     "Potato___Early_blight": "Potato___Early_blight",
     "Potato___Late_blight": "Potato___Late_blight",
@@ -33,16 +33,21 @@ def main():
 
     print("Found PlantVillage dataset. Starting processing...")
     
+    # Clear out existing processed directory before reprocessing
+    if PROCESSED_DIR.exists():
+        print(f"Clearing existing processed directory: {PROCESSED_DIR}")
+        shutil.rmtree(PROCESSED_DIR)
+
     splits = {"train": 0.8, "val": 0.1, "test": 0.1}
     
     # Create output directories
     for split in splits.keys():
         (PROCESSED_DIR / split).mkdir(parents=True, exist_ok=True)
-        for class_name in TARGET_CLASSES.values():
+        for class_name in set(TARGET_CLASSES.values()):
             (PROCESSED_DIR / split / class_name).mkdir(parents=True, exist_ok=True)
             
     # Track metrics for summary
-    summary = {split: {cls: 0 for cls in TARGET_CLASSES.values()} for split in splits.keys()}
+    summary = {split: {cls: 0 for cls in set(TARGET_CLASSES.values())} for split in splits.keys()}
 
     # Check inner structure, sometimes there is an extra nested 'PlantVillage' folder
     search_dir = PLANTVILLAGE_DIR
@@ -58,7 +63,8 @@ def main():
         if class_name not in TARGET_CLASSES:
             continue
             
-        print(f"\nProcessing class: {class_name}")
+        target_class_name = TARGET_CLASSES[class_name]
+        print(f"\nProcessing class: {class_name} -> {target_class_name}")
         
         # PlantVillage usually has .JPG or .jpg extensions
         images = list(class_folder.glob("*.jpg")) + list(class_folder.glob("*.JPG"))
@@ -78,11 +84,11 @@ def main():
         }
         
         for split_name, img_list in split_dict.items():
-            dest_dir = PROCESSED_DIR / split_name / TARGET_CLASSES[class_name]
+            dest_dir = PROCESSED_DIR / split_name / target_class_name
             for img_path in tqdm(img_list, desc=f"  -> {split_name}", leave=False):
                 dest_path = dest_dir / img_path.name
                 shutil.copy2(img_path, dest_path)
-            summary[split_name][class_name] = len(img_list)
+            summary[split_name][target_class_name] = len(img_list)
             
     print("\n" + "="*40)
     print("DATASET PREPARATION SUMMARY")

@@ -38,3 +38,13 @@ share/python-wheels/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# dataset & trained models
+data/
+**/data/raw/
+**/data/processed/
+**/models/
+*.pt 
+*.pth 
+
+
