@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers.health import router as health_router
+from routers.pest import router as pest_router
 
 app = FastAPI(title="किसानसारथी")
 
@@ -15,6 +16,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(pest_router)
 
 @app.get("/")
 def read_root():
