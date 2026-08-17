@@ -9,3 +9,5 @@ pillow
 torch
 torchvision
 python-multipart
+scikit-learn
+tqdm
