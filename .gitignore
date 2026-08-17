@@ -43,8 +43,9 @@ Thumbs.db
 data/
 **/data/raw/
 **/data/processed/
-**/models/
-*.pt 
-*.pth 
+!ml-api/models/
+!ml-api/models/*.pt
+!ml-api/models/*.json
+
 
 
